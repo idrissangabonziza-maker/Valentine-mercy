@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>404 Valentine</title>
+
+<style>
+  * {
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+  }
+
+  body {
+    margin: 0;
+    height: 100vh;
+    background: linear-gradient(135deg, #ffdde1, #ee9ca7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .screen {
+    text-align: center;
+    padding: 20px;
+    max-width: 90%;
+    animation: fadeIn 0.8s ease;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+  }
+
+  p {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+  }
+
+  button {
+    padding: 12px 28px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    margin: 10px;
+    transition: transform 0.2s ease, opacity 0.5s ease;
+  }
+
+  button:hover {
+    transform: scale(1.08);
+  }
+
+  .refresh-btn {
+    background: #ff4b5c;
+    color: white;
+  }
+
+  .yes-btn {
+    background: #ff4b5c;
+    color: white;
+  }
+
+  .no-btn {
+    background: #555;
+    color: white;
+  }
+
+  .hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .message {
+    margin-top: 25px;
+    font-size: 1.1rem;
+    white-space: pre-line;
+  }
+
+  canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+</style>
+</head>
+
+<body>
+
+<canvas id="confetti"></canvas>
+
+<div id="errorScreen" class="screen">
+  <h1>404</h1>
+  <p>Oops! Page Not Found 💔</p>
+  <button class="refresh-btn" onclick="showValentine()">Refresh</button>
+</div>
+
+<div id="valentineScreen" class="screen" style="display:none;">
+  <h1>Will you be my Valentine? 💘</h1>
+  <div id="buttons">
+    <button class="yes-btn" onclick="yesClicked()">YES</button>
+    <button class="no-btn">NO</button>
+  </div>
+  <div id="agreement" class="message"></div>
+</div>
+
+<script>
+  function showValentine() {
+    document.getElementById("errorScreen").style.display = "none";
+    document.getElementById("valentineScreen").style.display = "block";
+  }
+
+  function yesClicked() {
+    const agreement = document.getElementById("agreement");
+    agreement.textContent =
+`By clicking YES you agree to:
+• Unlimited cuddles
+• Lifetime supply of bad puns
+• Mutual pizza stealing rights
+Effective immediately! 🚀`;
+
+    setTimeout(() => {
+      document.getElementById("buttons").classList.add("hidden");
+    }, 1000);
+
+    startConfetti(5000);
+  }
+
+  // Confetti Effect
+  const canvas = document.getElementById("confetti");
+  const ctx = canvas.getContext("2d");
+  let confettiPieces = [];
+  let animation;
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener("resize", resizeCanvas);
+  resizeCanvas();
+
+  function startConfetti(duration) {
+    confettiPieces = Array.from({ length: 200 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height - canvas.height,
+      r: Math.random() * 6 + 4,
+      d: Math.random() * duration,
+      color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+      tilt: Math.random() * 10
+    }));
+
+    const startTime = Date.now();
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confettiPieces.forEach(p => {
+        ctx.beginPath();
+        ctx.fillStyle = p.color;
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+
+        p.y += 4;
+        p.x += Math.sin(p.tilt);
+        p.tilt += 0.1;
+
+        if (p.y > canvas.height) p.y = -10;
+      });
+
+      if (Date.now() - startTime < duration) {
+        animation = requestAnimationFrame(draw);
+      } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        cancelAnimationFrame(animation);
+      }
+    }
+
+    draw();
+  }
+</script>
+
+</body>
+</html>
